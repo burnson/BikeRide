@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+Dir.chdir(File.expand_path(File.dirname(__FILE__)))
+index = File.read('index-template.html')
+if !system('which jslint')
+  system('npm install jslint')
+end
+system('jslint --indent 2 --maxlen 80 *.js') || fail('Failed lint')
+index.gsub!('/*include:index-bikeride.js*/') {
+  File.read('index-bikeride.js')}
+File.write('index.html', index)
+system('open index.html') if ARGV.include?('--include')

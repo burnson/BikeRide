@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+Dir.chdir(File.expand_path(File.dirname(__FILE__)))
+def verbose(command)
+  puts "--> #{command}"
+  system(command) || fail("Failed: #{command}")
+end
+verbose('rm -f *.exe*')
+verbose('rm -f *.pdf')
+verbose("vbnc /debug:full /nowarn Main.vb #{Dir.glob('bb*.vb').join(' ')}")
+verbose('mono --debug Main.exe')
+hash_check = 'openssl dgst -md5 Output.pdf'
+hash_correct = '5b5b97187a422035d681454400d83962'
+verbose(hash_check)
+hash = `#{hash_check}`.strip.gsub(/.*= /, '')
+if hash != hash_correct
+  fail("Hash does not match expected: #{hash_correct}")
+end
